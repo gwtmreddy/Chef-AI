@@ -6,21 +6,33 @@ import { getRecipeFromMistral } from "../ai";
 export default function Main() {
   const [ingredients, setIngredients] = useState([]);
   const [recipeShown, setRecipeShown] = useState(false);
+  const [recipeMarkdown, setRecipeMarkdown] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   function handleSubmit(event) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const newIngredient = formData.get("in gredient");
+    const newIngredient = formData.get("ingredient");
 
-    setIngredients((prevIngredients) => [...prevIngredients, newIngredient]);
+    if (newIngredient.trim() !== "") {
+      setIngredients((prevIngredients) => [...prevIngredients, newIngredient]);
+    }
 
     event.currentTarget.reset();
   }
 
-    async function getRecipe() {
-      const recipeMarkdown = await getRecipeFromMistral(ingredients);
-      console.log(recipeMarkdown);
+  async function getRecipe() {
+    setIsLoading(true);
+    try {
+      const recipe = await getRecipeFromMistral(ingredients);
+      setRecipeMarkdown(recipe);
+      setRecipeShown(true);
+    } catch (error) {
+      console.error("Error getting recipe:", error);
+    } finally {
+      setIsLoading(false);
     }
+  }
 
   return (
     <>
@@ -38,9 +50,11 @@ export default function Main() {
         <Ingredients
           ingredients={ingredients}
           getRecipe={getRecipe}
+          isLoading={isLoading}
         />
       )}
-      {recipeShown && <ShowRecipe />}
+      
+      {recipeShown && <ShowRecipe recipeMarkdown={recipeMarkdown} />}
     </>
   );
 }

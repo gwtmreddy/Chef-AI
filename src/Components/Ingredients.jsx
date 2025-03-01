@@ -1,4 +1,5 @@
 import PropTypes from "prop-types";
+
 export default function Ingredients(props) {
   return (
     <section>
@@ -14,7 +15,12 @@ export default function Ingredients(props) {
             <h3>Ready for a recipe?</h3>
             <p>Generate a recipe from your list of ingredients.</p>
           </div>
-          <button onClick={props.getRecipe}>Get a Recipe</button>
+          <button 
+            onClick={props.getRecipe} 
+            disabled={props.isLoading}
+          >
+            {props.isLoading ? "Generating..." : "Get a Recipe"}
+          </button>
         </div>
       )}
     </section>
@@ -25,4 +31,9 @@ export default function Ingredients(props) {
 Ingredients.propTypes = {
   ingredients: PropTypes.array.isRequired,
   getRecipe: PropTypes.func.isRequired,
+  isLoading: PropTypes.bool
+};
+
+Ingredients.defaultProps = {
+  isLoading: false
 };
